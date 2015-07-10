@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -52,11 +53,19 @@ Options:
 
 
                 var task = PopularPackagesByYear(serviceUrl, year, numToDisplay);
+
                 task.Wait();
             }
             
         }
 
+        /// <summary>
+        /// Displays most popular packages for a given year
+        /// </summary>
+        /// <param name="serviceUrl">Nuget feed url</param>
+        /// <param name="year">2014</param>
+        /// <param name="numPackages">Number of top most popular1 packages to display for each month</param>
+        /// <returns></returns>
         private static async Task PopularPackagesByYear(string serviceUrl, int year, int numPackages)
         {
             var context = new V2FeedContext(new Uri(serviceUrl));
@@ -66,15 +75,25 @@ Options:
 
             var searchApi = new PackageLookup(context);
 
+            // queue a task for each month
+            var tasks = new List<Task<IEnumerable<PackageReleaseInfo>>>();
             for (var i = 1; i < 13; ++i)
             {
                 var startDate = new DateTime(year, i, 1);
                 var endDate = startDate.AddMonths(1);
 
-                var packagesInMonth = (await searchApi.SearchReleasesByTime(startDate, endDate, numPackages)).ToList();
+                var task = searchApi.SearchReleasesByTime(startDate, endDate, numPackages);
 
+                tasks.Add(task);
+            }
+
+            await Task.WhenAll(tasks);
+            // display the results
+            for(var i=0; i<tasks.Count; ++i)
+            {
+                var packagesInMonth = tasks[i].Result.ToList();
                 Console.WriteLine("------------------------------------");
-                Console.WriteLine("{0:MMMM yyyy}", startDate);
+                Console.WriteLine("{0:MMMM yyyy}", new DateTime(year, i+1, 1));
                 Console.WriteLine("------------------------------------");
 
                 foreach (var p in packagesInMonth)
@@ -82,6 +101,7 @@ Options:
                     Console.WriteLine("{0} {1} [{2} downloads]", p.Id, p.Version, p.DownloadCount);
                 }
             }
+
         }
 
 
