@@ -41,7 +41,7 @@ Options:
                 int nextYear = DateTime.Now.Year + 1;
                 if (!(int.TryParse(arguments["<year>"].ToString(), out year) && year > lowestYear && year < nextYear))
                 {
-                    Console.Error.WriteLine("Enter a valid year [{0}-{1}]", lowestYear, nextYear - 1);
+                    Console.Error.WriteLine("Enter a valid year [{0}-{1}]", lowestYear+1, nextYear - 1);
                     return;
                 }
 
