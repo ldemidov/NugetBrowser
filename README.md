@@ -19,3 +19,12 @@ Options:
     --api=<url>             Path to Nuget feed api [default: https://www.nuget.org/api/v2].
 ```
 
+Recommended procedure for running the sample
+
+1. Download repository from GitHub
+2. Open solution in Visual Studio 2013
+3. Restore Nuget packages if necessary
+4. Compile the NugetBrowser project
+5. Run the generated NugetBrowser executable from bin\Debug folder.
+
+The Tests.NugetBrowser uses the Xunit framework.  Follow this tutorial to setup XUnit on your machine: http://xunit.github.io/docs/getting-started.html
